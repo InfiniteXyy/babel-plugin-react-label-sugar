@@ -122,14 +122,12 @@ function reactLabelSugar(_: any, options: PluginOptions): PluginItem {
  */
 function getTargetRef(leftValue: object | null | undefined, refs: ReactRefs): ReactRefItem | undefined {
   if (!isIdentifier(leftValue) && !isMemberExpression(leftValue)) return undefined;
-  let target: string;
   if (isIdentifier(leftValue)) {
-    target = leftValue.name;
+    const target = leftValue.name;
+    return refs.find((ref) => ref.identify.name === target);
   } else {
-    if (!isIdentifier(leftValue.object)) return undefined;
-    target = leftValue.object.name;
+    return getTargetRef(leftValue.object, refs);
   }
-  return refs.find((ref) => ref.identify.name === target);
 }
 
 /**
