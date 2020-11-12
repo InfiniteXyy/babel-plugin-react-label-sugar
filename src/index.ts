@@ -1,24 +1,33 @@
 import { PluginItem } from "@babel/core";
 import {
+  arrayPattern,
+  arrowFunctionExpression,
+  binaryExpression,
   callExpression,
   identifier,
   Identifier,
-  arrayPattern,
-  variableDeclarator,
   isAssignmentExpression,
   isExpressionStatement,
   isIdentifier,
+  numericLiteral,
   variableDeclaration,
+  variableDeclarator,
 } from "@babel/types";
 import { capitalize } from "./utils";
 
-const RefLabel = "ref";
+const DefaultRefLabel = "ref";
+const DefaultRefFactory = "React.useState";
 
+type PluginOptions = { RefLabel: string; RefFactory: string };
 type ReactRefItem = { identify: Identifier; modifier: Identifier };
 type ReactRefs = ReactRefItem[];
 type ReactRefsState = { reactRefs?: ReactRefs };
 
-function reactRefSugar(): PluginItem {
+function reactRefSugar(_: any, options: PluginOptions): PluginItem {
+  const {
+    RefFactory = DefaultRefFactory,
+    RefLabel = DefaultRefLabel,
+  } = options;
   return {
     visitor: {
       LabeledStatement: (path, state: ReactRefsState) => {
@@ -42,14 +51,16 @@ function reactRefSugar(): PluginItem {
 
         const refItem: ReactRefItem = {
           identify: left,
-          modifier: identifier(`set${capitalize(left.name)}`),
+          modifier: path.scope.generateUidIdentifier(
+            `set${capitalize(left.name)}`
+          ),
         };
 
         path.replaceWith(
           variableDeclaration("const", [
             variableDeclarator(
               arrayPattern([refItem.identify, refItem.modifier]),
-              callExpression(identifier("useState"), [right])
+              callExpression(identifier(RefFactory), [right])
             ),
           ])
         );
@@ -59,15 +70,50 @@ function reactRefSugar(): PluginItem {
       AssignmentExpression: (path, state: ReactRefsState) => {
         if (!state.reactRefs) return;
         const { node } = path;
-        if (isIdentifier(node.left)) {
-          const identify = node.left.name;
-          const ref = state.reactRefs.find(
-            (ref) => ref.identify.name === identify
+        if (!isIdentifier(node.left)) return;
+        const identify = node.left.name;
+        const ref = state.reactRefs.find(
+          (ref) => ref.identify.name === identify
+        );
+        if (!ref) return;
+        if (node.operator === "=") {
+          path.replaceWith(callExpression(ref.modifier, [node.right]));
+        } else {
+          path.replaceWith(
+            callExpression(ref.modifier, [
+              arrowFunctionExpression(
+                [ref.identify],
+                binaryExpression(
+                  node.operator.slice(0, -1) as any,
+                  ref.identify,
+                  node.right
+                )
+              ),
+            ])
           );
-          if (ref) {
-            path.replaceWith(callExpression(ref.modifier, [node.right]));
-          }
         }
+      },
+      UpdateExpression: (path, state: ReactRefsState) => {
+        if (!state.reactRefs) return;
+        const { node } = path;
+        if (!isIdentifier(node.argument)) return;
+        const identify = node.argument.name;
+        const ref = state.reactRefs.find(
+          (ref) => ref.identify.name === identify
+        );
+        if (!ref) return;
+        path.replaceWith(
+          callExpression(ref.modifier, [
+            arrowFunctionExpression(
+              [ref.identify],
+              binaryExpression(
+                node.operator === "++" ? "+" : "-",
+                ref.identify,
+                numericLiteral(1)
+              )
+            ),
+          ])
+        );
       },
     },
   };
