@@ -1,81 +1,78 @@
 ## babel-plugin-react-label-sugar
 
-#### Quick Start
-install
+A simple `React.useState` sugar based on js label
+
+### Quick Start
+1⃣️ install
 ```
 npm install --save-dev babel-plugin-react-label-sugar
 ```
 
-.babelrc
+2⃣️ add plugin in .babelrc
 ```json
 {
   "plugins": ["babel-plugin-react-label-sugar"]
 }
 ```
 
-default options:
-```json
-{ "RefLabel": "ref", "RefFactory": "React.useState" }
+3⃣️ (optional) custom options
+```json5
+{ 
+    "refLabel": "$", // default is "ref"
+    "refFactory": "useState", // default is "React.useState"
+    "ignoreMemberExpr": false, // default is true, see "with immer" below for more info
+}
 ```
 
-#### Examples
-
-**Basic**
+### Examples
 
 ```ts
-() => {
-  ref: count = 0;
-  // ...
-  count = count * 2;
-}
-
-// will be transpiled to 
-
-() => {
-  const [count, setCount] = useState(0)
-  // ...
-  setCount(count * 2)
-}
+// before
+ref: count = 0;
+count = count * 2;
+count++;
+count *= 3;
+// after
+const [count, setCount] = useState(0)
+setCount(count * 2);
+setCount(count => count + 1);
+setCount(count => count * 3);
 ```
 
-**Self update**
+### Q&A
 
-```ts
-() => {
-  ref: count = 0;
-  // ...
-  count++;
-}
+Q: Can I use it to declare object state like we did in `Vue ref`?
 
-// will be transpiled to 
+A: No, this plugin doesn't do anything on your code, but transpile the label expression to useState function call.
 
-() => {
-  const [count, setCount] = useState(0)
-  // ...
-  setCount(count => count + 1)
-}
+```tsx
+// so you must use it like this
+$: student = { name: "xyy" };
+
+<input onChange={e => student = { ...student, name: e.target.value }}></input>
 ```
 
-**When name conflict**
+_**Work with immer**_
 
-```ts
-() => {
-  const setCount = () => {};
-  ref: count = 0;
-  // ...
-  count++;
-}
+1⃣️ set `ignoreMemberExpr` to be `true` in `.babelrc`
 
-// will be transpiled to 
+2⃣️ set `refFactory` to be `useImmer` in `.babelrc`
 
-() => {
-  const setCount = () => {};
-  const [count, _setCount] = useState(0)
-  // ...
-  _setCount(count => count + 1)
-}
+3⃣️ install and import `useImmer` in your code
+
+```jsx
+// before
+ref: obj = { count: 0 }
+obj.count++;
+
+// after
+const [obj, setObj] = useImmer({ count: 0 });
+setObj((obj) => { obj.count++ });
 ```
 
-#### But why?
+### Todo List
+- [x] support useImmer, transpile `obj.value = 1` to `setObject(obj => obj.value = 1)`
 
-just for fun :/
+### But why?
+
+just for fun :) 😄
