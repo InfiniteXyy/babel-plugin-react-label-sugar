@@ -8,11 +8,11 @@
     "README.md"
   ],
   "scripts": {
-    "watch": "npm run build -- --watch",
     "postinstall": "npm run build",
+    "test": "ts-mocha tests/*.tsx",
     "build": "babel --extensions '.ts' src --out-dir lib",
-    "prepare": "npm test && npm run build",
-    "test": "ts-mocha tests/*.tsx"
+    "prepare": "npm run build",
+    "watch": "npm run build -- --watch"
   },
   "keywords": [
     "babel",
