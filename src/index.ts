@@ -23,7 +23,7 @@ type ReactRefItem = { identify: Identifier; modifier: Identifier };
 type ReactRefs = ReactRefItem[];
 type ReactRefsState = { reactRefs?: ReactRefs };
 
-function reactRefSugar(_: any, options: PluginOptions): PluginItem {
+function reactLabelSugar(_: any, options: PluginOptions): PluginItem {
   const {
     RefFactory = DefaultRefFactory,
     RefLabel = DefaultRefLabel,
@@ -119,4 +119,4 @@ function reactRefSugar(_: any, options: PluginOptions): PluginItem {
   };
 }
 
-export default reactRefSugar;
+export default reactLabelSugar;

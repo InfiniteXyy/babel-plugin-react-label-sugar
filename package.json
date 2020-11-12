@@ -1,7 +1,7 @@
 {
-  "name": "babel-plugin-react-ref-sugar",
-  "version": "1.0.0",
-  "description": "babel plugin to use ref sugar for useState hook",
+  "name": "babel-plugin-react-label-sugar",
+  "version": "0.0.1",
+  "description": "babel plugin to use label sugar for useState hook",
   "main": "lib/index.js",
   "files": [
     "lib",
@@ -18,11 +18,11 @@
     "plugin",
     "react",
     "react hooks",
-    "ref sugar"
+    "label sugar"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/InfiniteXyy/babel-plugin-react-ref-sugar"
+    "url": "https://github.com/InfiniteXyy/babel-plugin-react-label-sugar"
   },
   "author": "Yiyang Xu",
   "license": "MIT",
@@ -41,6 +41,7 @@
     "@types/node": "^14.14.7",
     "chai": "^4.2.0",
     "mocha": "^8.2.1",
+    "nyc": "^15.1.0",
     "prettier": "^2.1.2",
     "terser": "^5.3.8",
     "ts-mocha": "^8.0.0",

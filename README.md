@@ -1,15 +1,15 @@
-## babel-plugin-react-ref-sugar
+## babel-plugin-react-label-sugar
 
 #### Quick Start
 install
 ```
-npm install --save-dev babel-plugin-react-ref-sugar
+npm install --save-dev babel-plugin-react-label-sugar
 ```
 
 .babelrc
 ```json
 {
-  "plugins": ["babel-plugin-react-ref-sugar"]
+  "plugins": ["babel-plugin-react-label-sugar"]
 }
 ```
 
