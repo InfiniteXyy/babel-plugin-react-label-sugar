@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-react-label-sugar",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "babel plugin to use label sugar for useState hook",
   "main": "lib/index.js",
   "files": [
@@ -8,7 +8,6 @@
     "README.md"
   ],
   "scripts": {
-    "postinstall": "npm run build",
     "test": "ts-mocha tests/*.tsx",
     "build": "babel --extensions \".ts\" src --out-dir lib",
     "prepare": "npm run build",

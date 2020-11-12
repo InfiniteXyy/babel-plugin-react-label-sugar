@@ -1,11 +1,11 @@
 import { transformSync } from "@babel/core";
 import { expect } from "chai";
-import { resolve } from "path";
 import { minify } from "terser";
+import ReactLabelSugar from "../src";
 
-const plugins = [resolve(__dirname, "../lib")];
+const plugins = [ReactLabelSugar];
 const pluginsWithOption = [
-  [resolve(__dirname, "../lib"), { RefLabel: "$", RefFactory: "useState" }],
+  [ReactLabelSugar, { RefLabel: "$", RefFactory: "useState" }]
 ];
 
 describe("test react-label-sugar", () => {
