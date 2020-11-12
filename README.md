@@ -2,20 +2,22 @@
 
 A simple `React.useState` sugar based on js label
 
+just for fun :) 😄
+
 ### Quick Start
-1⃣️ install
-```
+```sh
+# install
 npm install --save-dev babel-plugin-react-label-sugar
 ```
 
-2⃣️ add plugin in .babelrc
+Add plugin in .babelrc
 ```json
 {
   "plugins": ["babel-plugin-react-label-sugar"]
 }
 ```
 
-3⃣️ (optional) custom options
+(optional) custom options
 ```json5
 { 
     "refLabel": "$", // default is "ref"
@@ -54,11 +56,11 @@ $: student = { name: "xyy" };
 
 _**Work with immer**_
 
-1⃣️ set `ignoreMemberExpr` to be `true` in `.babelrc`
+Set `ignoreMemberExpr` to be `true` in `.babelrc`
 
-2⃣️ set `refFactory` to be `useImmer` in `.babelrc`
+Set `refFactory` to be `useImmer` in `.babelrc`
 
-3⃣️ install and import `useImmer` in your code
+Install and import `useImmer` in your code
 
 ```jsx
 // before
@@ -72,7 +74,3 @@ setObj((obj) => { obj.count++ });
 
 ### Todo List
 - [x] support useImmer, transpile `obj.value = 1` to `setObject(obj => obj.value = 1)`
-
-### But why?
-
-just for fun :) 😄
