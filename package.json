@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "watch": "npm run build -- --watch",
+    "postinstall": "npm run build",
     "build": "babel --extensions '.ts' src --out-dir lib",
     "prepare": "npm test && npm run build",
     "test": "ts-mocha tests/*.tsx"
