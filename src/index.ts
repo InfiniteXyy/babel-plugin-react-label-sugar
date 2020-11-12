@@ -37,7 +37,7 @@ function reactLabelSugar(_: any, options: PluginOptions): PluginItem {
   return {
     visitor: {
       LabeledStatement: (path, state: ReactRefsState) => {
-        const { node } = path;
+        const { node, scope } = path;
         const { label, body } = node;
         if (label.name !== refLabel) return;
 
@@ -57,7 +57,7 @@ function reactLabelSugar(_: any, options: PluginOptions): PluginItem {
 
         const refItem: ReactRefItem = {
           identify: left,
-          modifier: path.scope.generateUidIdentifier(`set${capitalize(left.name)}`),
+          modifier: scope.generateUidIdentifier(`set${capitalize(left.name)}`),
         };
 
         path.replaceWith(
@@ -68,14 +68,14 @@ function reactLabelSugar(_: any, options: PluginOptions): PluginItem {
             ),
           ])
         );
-        if (!state.reactRefs) state.reactRefs = [];
+        state.reactRefs ??= [];
         state.reactRefs.push(refItem);
       },
       AssignmentExpression: (path, state: ReactRefsState) => {
         if (!state.reactRefs) return;
-        const { node } = path;
+        const { node, scope } = path;
         const ref = getTargetRef(node.left, state.reactRefs);
-        if (!ref) return;
+        if (!ref || scope.bindings[ref.identify.name]) return;
         if (isMemberExpression(node.left)) {
           !ignoreMemberExpr && handleMemberExpression(node.left, ref, path);
         } else {
@@ -88,21 +88,21 @@ function reactLabelSugar(_: any, options: PluginOptions): PluginItem {
       },
       UpdateExpression: (path, state: ReactRefsState) => {
         if (!state.reactRefs) return;
-        const { node } = path;
+        const { node, scope } = path;
         const ref = getTargetRef(node.argument, state.reactRefs);
-        if (!ref) return;
+        if (!ref || scope.bindings[ref.identify.name]) return;
         if (isMemberExpression(node.argument)) {
           !ignoreMemberExpr && handleMemberExpression(node.argument, ref, path);
-        } else {
-          path.replaceWith(
-            callExpression(ref.modifier, [
-              arrowFunctionExpression(
-                [ref.identify],
-                binaryExpression(node.operator === "++" ? "+" : "-", ref.identify, numericLiteral(1))
-              ),
-            ])
-          );
+          return;
         }
+        path.replaceWith(
+          callExpression(ref.modifier, [
+            arrowFunctionExpression(
+              [ref.identify],
+              binaryExpression(node.operator === "++" ? "+" : "-", ref.identify, numericLiteral(1))
+            ),
+          ])
+        );
       },
     },
   };

@@ -4,7 +4,7 @@ import { minify as _minify } from "terser";
 import ReactLabelSugar from "../src";
 
 const minify = async (code?: string | null): Promise<string> => {
-  return (await _minify(code ?? "")).code ?? "";
+  return (await _minify(code ?? "", { format: { beautify: true }, compress: false })).code ?? "";
 };
 
 const plugins = [ReactLabelSugar];
@@ -75,18 +75,25 @@ describe("test react-label-sugar", () => {
       const code = `
       function App() {
         ref: count = 0;
-        let other = 1;
-        return () => { count = 1; other = 1; };
+        useEffect(() => {
+          let count = 0;
+          count++;
+        }, []);
+        return () => { count = 1; };
       }
     `;
       const actual = transformSync(code, { plugins })?.code;
       const expected = await minify(`
       function App() {
         const [count, setCount] = React.useState(0);
-        let other = 1;
-        return () => { setCount((count) => 1); other = 1; };
+        useEffect(() => {
+          let count = 0;
+          count++;
+        }, []);
+        return () => { setCount((count) => 1); };
       }
     `);
+
       expect(await minify(actual)).to.equal(await minify(expected));
     });
 
