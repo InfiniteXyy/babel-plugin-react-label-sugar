@@ -124,15 +124,18 @@ describe("test react-label-sugar", () => {
     });
 
     it("should member expression works", async () => {
-      const code = `$: obj = { count: 0 }; obj.count = 2; obj.count++;`;
+      const code = `$: obj = { count: 0, foo: { bar: 1 } }; obj.count = 2; obj.count++; obj.foo.bar = 2;`;
       const actual = transformSync(code, { plugins: pluginsWithOption })?.code ?? "";
       const expected = `
-      const [obj, _setObj] = useImmer({ count: 0 });
+      const [obj, _setObj] = useImmer({ count: 0, foo: { bar: 1 } });
       _setObj(obj => {
         obj.count = 2;
       });
       _setObj(obj => {
         obj.count++;
+      });
+      _setObj(obj => {
+        obj.foo.bar = 2;
       });
       `;
       expect(await minify(actual)).to.equal(await minify(expected));

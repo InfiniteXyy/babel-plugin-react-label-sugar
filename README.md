@@ -20,9 +20,9 @@ Add plugin in .babelrc
 (optional) custom options
 ```json5
 { 
-    "refLabel": "$", // default is "ref"
-    "refFactory": "useState", // default is "React.useState"
-    "ignoreMemberExpr": false, // default is true, see "with immer" below for more info
+  "refLabel": "$", // default is "ref"
+  "refFactory": "useState", // default is "React.useState"
+  "ignoreMemberExpr": false, // default is true, see "with immer" below for more info
 }
 ```
 
