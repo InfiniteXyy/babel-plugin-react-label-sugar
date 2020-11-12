@@ -33,14 +33,14 @@ describe("test react-label-sugar", () => {
       const code = `
       function App() {
         ref: count = 20 * 3;
-        return React.createElement("button", { onClick: () => count = count + 1 }, count)
+        return () => count = count + 1
       }
     `;
       const actual = transformSync(code, { plugins })?.code;
       const expected = `
       function App() {
         const [count, setCount] = React.useState(20 * 3);
-        return React.createElement("button", { onClick: () => setCount(count + 1) }, count)
+        return () => setCount(count => count + 1)
       }
     `;
       expect(await minify(actual)).to.equal(await minify(expected));
@@ -54,7 +54,7 @@ describe("test react-label-sugar", () => {
         const _setCount2 = () => {};
         ref: count = 0;
         ref: count2 = 1;
-        return React.createElement("button", { onClick: () => { count = 1; count2 = 2; } });
+        return () => { count = 1; count2 = 2; };
       }
     `;
       const actual = transformSync(code, { plugins })?.code;
@@ -65,7 +65,7 @@ describe("test react-label-sugar", () => {
         const _setCount2 = () => {};
         const [count, _setCount] = React.useState(0);
         const [count2, _setCount3] = React.useState(1);
-        return React.createElement("button", { onClick: () => { _setCount(1); _setCount3(2); } });
+        return () => { _setCount((count) => 1); _setCount3((count) => 2); };
       }
     `;
       expect(await minify(actual)).to.equal(await minify(expected));
@@ -76,7 +76,7 @@ describe("test react-label-sugar", () => {
       function App() {
         ref: count = 0;
         let other = 1;
-        return React.createElement("button", { onClick: () => { count = 1; other = 1; } });
+        return () => { count = 1; other = 1; };
       }
     `;
       const actual = transformSync(code, { plugins })?.code;
@@ -84,7 +84,7 @@ describe("test react-label-sugar", () => {
       function App() {
         const [count, setCount] = React.useState(0);
         let other = 1;
-        return React.createElement("button", { onClick: () => { setCount(1); other = 1; } });
+        return () => { setCount((count) => 1); other = 1; };
       }
     `);
       expect(await minify(actual)).to.equal(await minify(expected));
@@ -95,7 +95,7 @@ describe("test react-label-sugar", () => {
       function App() {
         ref: count = 0;
         ref: count2 = 0;
-        return React.createElement("button", { onClick: () => { count *= 2; count2++; } });
+        return () => { count *= 2; count2++; };
       }
     `;
       const actual = transformSync(code, { plugins })?.code;
@@ -103,7 +103,7 @@ describe("test react-label-sugar", () => {
       function App() {
         const [count, setCount] = React.useState(0);
         const [count2, setCount2] = React.useState(0);
-        return React.createElement("button", { onClick: () => { setCount(count => count * 2); setCount2(count => count + 1) } });
+        return () => { setCount(count => count * 2); setCount2(count => count + 1) };
       }
     `;
       expect(await minify(actual)).to.equal(await minify(expected));

@@ -79,18 +79,11 @@ function reactLabelSugar(_: any, options: PluginOptions): PluginItem {
         if (isMemberExpression(node.left)) {
           !ignoreMemberExpr && handleMemberExpression(node.left, ref, path);
         } else {
-          if (node.operator === "=") {
-            path.replaceWith(callExpression(ref.modifier, [node.right]));
-          } else {
-            path.replaceWith(
-              callExpression(ref.modifier, [
-                arrowFunctionExpression(
-                  [ref.identify],
-                  binaryExpression(node.operator.slice(0, -1) as any, ref.identify, node.right)
-                ),
-              ])
-            );
-          }
+          const arrowReturn =
+            node.operator === "="
+              ? node.right
+              : binaryExpression(node.operator.slice(0, -1) as any, ref.identify, node.right);
+          path.replaceWith(callExpression(ref.modifier, [arrowFunctionExpression([ref.identify], arrowReturn)]));
         }
       },
       UpdateExpression: (path, state: ReactRefsState) => {
