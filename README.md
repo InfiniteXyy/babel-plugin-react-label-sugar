@@ -18,9 +18,11 @@ Add plugin in .babelrc
 (optional) custom options
 ```json5
 { 
-  "refLabel": "$", // default is "ref"
-  "refFactory": "useState", // default is "React.useState"
-  "ignoreMemberExpr": false, // default is true, see "with immer" below for more info
+  "refLabel": "$",              // default is "ref"
+  "stateFactory": "useState",   // default is "React.useState"
+  "memoFactory": "useMemo",     // default is "React.useMemo"
+  "effectFactory": "useEffect", // default is "React.useEffect"
+  "ignoreMemberExpr": false,    // default is true, will skip object value mutation
 }
 ```
 
@@ -29,19 +31,25 @@ Add plugin in .babelrc
 ```ts
 // before
 ref: count = 0;
-count = count * 2;
+watch: doubled = count => count * 2
+watch: count => console.log(count)
+
 count++;
-count *= 3;
+count = 10;
 // after
-const [count, setCount] = useState(0)
-setCount(count * 2);
+const [count, setCount] = useState(0);
+const doubled = useMemo(() => count * 2, [count]);
+useEffect(() => {
+  console.log(count);
+}, [count])
+
 setCount(count => count + 1);
-setCount(count => count * 3);
+setCount(count => 10);
 ```
 
 ### Q&A
 
-Q: Can I use it to declare object state like we did in `Vue ref`?
+Q: Can I use it to declare objects like `Vue ref`?
 
 A: No, this plugin doesn't do anything on your code, but transpile the label expression to useState function call.
 
@@ -52,11 +60,9 @@ $: student = { name: "xyy" };
 <input onChange={e => student = { ...student, name: e.target.value }}></input>
 ```
 
-_**Work with immer**_
+But you can use immer to achieve this
 
-Set .babelrc `{ "ignoreMemberExpr": false, "refFactory": "useImmer" }`
-
-Install and import `useImmer` in your code
+Set .babelrc `{ "ignoreMemberExpr": false, "stateFactory": "useImmer" }`
 
 ```jsx
 // before
@@ -70,13 +76,13 @@ setObj((obj) => { obj.count++ });
 
 ### Todo List
 - [x] support useImmer, transpile `obj.value = 1` to `setObject(obj => obj.value = 1)`
-- [ ] more labels, auto generate dependency list.
+- [x] more labels, auto generate dependency list.
 ```ts
 ref: count = 1;
 // useMemo
-watch: doubled = ([count]) => count * 2;
+watch: doubled = (count) => count * 2;
 // useEffect
-watch: ([doubled]) => {
+watch: (doubled) => {
   console.log(doubled);
 }
 ```
