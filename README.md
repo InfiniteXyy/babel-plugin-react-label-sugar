@@ -2,6 +2,10 @@
 
 A simple React Label Sugar just for fun :) 😄
 
+online babel playground: https://shorturl.at/dBDN1
+
+codesandbox example: https://codesandbox.io/s/babel-react-label-sugar-example-ifuo2
+
 ### Quick Start
 ```sh
 # install
@@ -78,12 +82,4 @@ setObj((obj) => { obj.count++ });
 ### Todo List
 - [x] support useImmer, transpile `obj.value = 1` to `setObject(obj => obj.value = 1)`
 - [x] more labels, auto generate dependency list.
-```ts
-ref: count = 1;
-// useMemo
-watch: doubled = (count) => count * 2;
-// useEffect
-watch: (doubled) => {
-  console.log(doubled);
-}
-```
+- [ ] custom labels
