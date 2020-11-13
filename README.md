@@ -19,6 +19,7 @@ Add plugin in .babelrc
 ```json5
 { 
   "refLabel": "$",              // default is "ref"
+  "watchLabel": "on",           // default is "watch"
   "stateFactory": "useState",   // default is "React.useState"
   "memoFactory": "useMemo",     // default is "React.useMemo"
   "effectFactory": "useEffect", // default is "React.useEffect"
