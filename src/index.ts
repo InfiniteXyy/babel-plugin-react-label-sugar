@@ -17,6 +17,7 @@ import {
   variableDeclaration,
   variableDeclarator,
 } from "@babel/types";
+import { Scope } from "@babel/traverse";
 import { capitalize } from "./utils";
 
 const DefaultRefLabel = "ref";
@@ -24,7 +25,7 @@ const DefaultRefFactory = "React.useState";
 const DefaultIgnoreMemberExpr = true;
 
 type PluginOptions = { refLabel?: string; refFactory?: string; ignoreMemberExpr?: boolean };
-type ReactRefItem = { identify: Identifier; modifier: Identifier };
+type ReactRefItem = { identify: Identifier; modifier: Identifier; scope: Scope };
 type ReactRefs = ReactRefItem[];
 type ReactRefsState = { reactRefs?: ReactRefs };
 
@@ -56,6 +57,7 @@ function reactLabelSugar(_: any, options: PluginOptions): PluginItem {
         }
 
         const refItem: ReactRefItem = {
+          scope,
           identify: left,
           modifier: scope.generateUidIdentifier(`set${capitalize(left.name)}`),
         };
@@ -75,7 +77,7 @@ function reactLabelSugar(_: any, options: PluginOptions): PluginItem {
         if (!state.reactRefs) return;
         const { node, scope } = path;
         const ref = getTargetRef(node.left, state.reactRefs);
-        if (!ref || scope.bindings[ref.identify.name]) return;
+        if (!ref || !isRefInTargetScope(scope, ref)) return;
         if (isMemberExpression(node.left)) {
           !ignoreMemberExpr && handleMemberExpression(node.left, ref, path);
         } else {
@@ -90,7 +92,7 @@ function reactLabelSugar(_: any, options: PluginOptions): PluginItem {
         if (!state.reactRefs) return;
         const { node, scope } = path;
         const ref = getTargetRef(node.argument, state.reactRefs);
-        if (!ref || scope.bindings[ref.identify.name]) return;
+        if (!ref || !isRefInTargetScope(scope, ref)) return;
         if (isMemberExpression(node.argument)) {
           !ignoreMemberExpr && handleMemberExpression(node.argument, ref, path);
           return;
@@ -136,6 +138,20 @@ function handleMemberExpression(node: MemberExpression, ref: ReactRefItem, path:
   );
   node.extra ??= {};
   node.extra.REACT_REF_HAS_SETTED = true;
+}
+
+/**
+ * check if ref binding has be override in current scope
+ * check if ref is not included in current scope
+ */
+function isRefInTargetScope(scope: Scope | undefined, ref: ReactRefItem): boolean {
+  if (!scope) return false;
+
+  if (scope === ref.scope) return true;
+  // if has overwritten ref in the path, return false;
+  if (scope.bindings[ref.identify.name]) return false;
+
+  return isRefInTargetScope(scope.parent, ref);
 }
 
 export default reactLabelSugar;

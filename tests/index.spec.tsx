@@ -11,7 +11,7 @@ const plugins = [ReactLabelSugar];
 const pluginsWithOption = [[ReactLabelSugar, { refLabel: "$", refFactory: "useImmer", ignoreMemberExpr: false }]];
 
 describe("test react-label-sugar", () => {
-  describe("unexpected cases", () => {
+  describe("ref: unexpected cases", () => {
     it("should fail if ref label is not an expression", () => {
       const code = `ref: if (true) {}`;
       expect(() => transformSync(code, { plugins })).to.throw("ref sugar must be an expression statement");
@@ -28,91 +28,22 @@ describe("test react-label-sugar", () => {
     });
   });
 
-  describe("happy path", () => {
-    it("should happy path success", async () => {
-      const code = `
-      function App() {
-        ref: count = 20 * 3;
-        return () => count = count + 1
-      }
-    `;
+  describe("ref: happy path", () => {
+    it("should basic usage success", async () => {
+      const code = `{ref: count = 0; count = count + 1;}`;
       const actual = transformSync(code, { plugins })?.code;
-      const expected = `
-      function App() {
-        const [count, setCount] = React.useState(20 * 3);
-        return () => setCount(count => count + 1)
-      }
-    `;
-      expect(await minify(actual)).to.equal(await minify(expected));
-    });
-
-    it("should generate correct modifier name when conflict", async () => {
-      const code = `
-      function App() {
-        const setCount = () => {};
-        const setCount2 = () => {};
-        const _setCount2 = () => {};
-        ref: count = 0;
-        ref: count2 = 1;
-        return () => { count = 1; count2 = 2; };
-      }
-    `;
-      const actual = transformSync(code, { plugins })?.code;
-      const expected = `
-      function App() {
-        const setCount = () => {};
-        const setCount2 = () => {};
-        const _setCount2 = () => {};
-        const [count, _setCount] = React.useState(0);
-        const [count2, _setCount3] = React.useState(1);
-        return () => { _setCount((count) => 1); _setCount3((count) => 2); };
-      }
-    `;
-      expect(await minify(actual)).to.equal(await minify(expected));
-    });
-
-    it("should not affect other expressions", async () => {
-      const code = `
-      function App() {
-        ref: count = 0;
-        useEffect(() => {
-          let count = 0;
-          count++;
-        }, []);
-        return () => { count = 1; };
-      }
-    `;
-      const actual = transformSync(code, { plugins })?.code;
-      const expected = await minify(`
-      function App() {
-        const [count, setCount] = React.useState(0);
-        useEffect(() => {
-          let count = 0;
-          count++;
-        }, []);
-        return () => { setCount((count) => 1); };
-      }
-    `);
-
+      const expected = `{const [count, setCount] = React.useState(0); setCount(count => count + 1);}`;
       expect(await minify(actual)).to.equal(await minify(expected));
     });
 
     it("should handle self update expression correct", async () => {
-      const code = `
-      function App() {
-        ref: count = 0;
-        ref: count2 = 0;
-        return () => { count *= 2; count2++; };
-      }
-    `;
+      const code = `{ref: count = 0; count *= 2; count += 2;}`;
       const actual = transformSync(code, { plugins })?.code;
-      const expected = `
-      function App() {
-        const [count, setCount] = React.useState(0);
-        const [count2, setCount2] = React.useState(0);
-        return () => { setCount(count => count * 2); setCount2(count => count + 1) };
-      }
-    `;
+      const expected = `{
+      const [count, setCount] = React.useState(0);
+      setCount(count => count * 2);
+      setCount(count => count + 2) 
+      }`;
       expect(await minify(actual)).to.equal(await minify(expected));
     });
 
@@ -126,7 +57,11 @@ describe("test react-label-sugar", () => {
     it("should ignore member expression at default", async () => {
       const code = `ref: obj = { count: 0 }; obj.count = 2; obj.count++;`;
       const actual = transformSync(code, { plugins })?.code ?? "";
-      const expected = `const [obj, _setObj] = React.useState({ count: 0 });obj.count = 2;obj.count++;`;
+      const expected = `
+      const [obj, _setObj] = React.useState({ count: 0 });
+      obj.count = 2;
+      obj.count++;
+      `;
       expect(await minify(actual)).to.equal(await minify(expected));
     });
 
@@ -145,6 +80,41 @@ describe("test react-label-sugar", () => {
         obj.foo.bar = 2;
       });
       `;
+      expect(await minify(actual)).to.equal(await minify(expected));
+    });
+
+    it("should ref not affect other scope", async () => {
+      const code = `{ ref: count = 0; } { count++; }`;
+      const actual = transformSync(code, { plugins })?.code ?? "";
+      const expected = `
+      { const [count, setCount] = React.useState(0); }
+      { count++; }
+      `;
+      expect(await minify(actual)).to.equal(await minify(expected));
+    });
+
+    it("should ref not affect closure", async () => {
+      const code = `{
+        ref: count = 0;
+        {
+          let count = 0;
+          {
+            count = 1;
+          }
+        }
+        count = 1;
+      }`;
+      const actual = transformSync(code, { plugins })?.code ?? "";
+      const expected = `{
+        const [count, setCount] = React.useState(0);
+        {
+          let count = 0;
+          {
+            count = 1;
+          } 
+        }
+        setCount((count) => 1);
+      }`;
       expect(await minify(actual)).to.equal(await minify(expected));
     });
   });
