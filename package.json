@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-react-label-sugar",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0",
   "description": "babel plugin to use label sugar for useState hook",
   "main": "lib/index.js",
   "files": [
