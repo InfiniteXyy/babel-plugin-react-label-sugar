@@ -79,6 +79,13 @@ const [obj, setObj] = useImmer({ count: 0 });
 setObj((obj) => { obj.count++ });
 ```
 
+### Tips
+
+If your program gets stuck while running the following command `value = e.target.value`. This is probably because you are using React 16. This plugin uses function arguments (eg. `setState(() => 1)`) by default when handling data changes, and React 16 loses event references due to its event pool.
+
+React 17, on the other hand, behaves just fine.
+
+
 ### Todo List
 - [x] support useImmer, transpile `obj.value = 1` to `setObject(obj => obj.value = 1)`
 - [x] more labels, auto generate dependency list.
