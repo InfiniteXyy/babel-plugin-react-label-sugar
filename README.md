@@ -19,6 +19,13 @@ Add plugin in .babelrc
 }
 ```
 
+If you use vite, add this config to vite `react` plugin (swc is not supported)
+```js
+{
+    plugins: [react({ babel: { babelrc: true } })],
+}
+```
+
 (optional) custom options
 ```json5
 { 
