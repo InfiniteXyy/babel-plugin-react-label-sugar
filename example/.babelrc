@@ -1,0 +1,22 @@
+{
+  "plugins": [
+    [
+      "babel-plugin-react-label-sugar",
+      {
+        "stateFactory": "useImmer",
+        "ignoreMemberExpr": false
+      }
+    ],
+    [
+      "babel-plugin-auto-import",
+      {
+        "declarations": [
+          {
+            "members": ["useImmer"],
+            "path": "use-immer"
+          }
+        ]
+      }
+    ]
+  ]
+}
