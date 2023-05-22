@@ -2,9 +2,9 @@
 
 A simple React Label Sugar just for fun :) 😄
 
-online babel [playground](https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&spec=false&loose=false&code_lz=GYVwdgxgLglg9mABAQQA6oBQEpEG8BQiiATgKbABciEc4UiAvIgAwDchiHA7gIZQQALKgBNaAIwA2pYY2q0w9BgD45dRACpEAJnZFufQSPFSZyvByI0wAZzhSAdBLgBzDKJCTpWXYgC-HDjIoEGIkAB4xECgoBEQEAGEJGAgAawZcbEYVGjoAalzfJVwchV8wgHpI6IQlfF8gA&debug=false&forceAllTransforms=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=false&presets=&prettier=true&targets=&version=7.12.3&externalPlugins=babel-plugin-react-label-sugar%400.1.0-alpha.4%2C%40babel%2Fplugin-syntax-jsx%407.12.1)
+online babel [playground](https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&corejs=3.21&spec=false&loose=false&code_lz=GYVwdgxgLglg9mABAQQA6oBQEpEG8BQiiATgKbABciEc4UiAvIgAwDchiHA7gIZQQALKgBNaAIwA2pYY2q0w9BgD45dRACpEAJnZFufQSPFSZyvByI0wAZzhSAdBLgBzDKJCTpWXYgC-HDjIoEGIkAB4xECgoBEQEAGEJGAgAawZcbEYVGjoAalzfJVwchV8wgHpI6IQlfF8gA&debug=false&forceAllTransforms=false&modules=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=false&presets=&prettier=true&targets=&version=7.21.8&externalPlugins=%40babel%2Fplugin-syntax-jsx%407.12.1%2Cbabel-plugin-react-label-sugar%400.1.0&assumptions=%7B%7D)
 
-codesandbox [example](https://codesandbox.io/s/babel-react-label-sugar-example-ifuo2)
+stackblitz [example](https://stackblitz.com/edit/vitejs-vite-cftpbu?file=src%2Fmain.jsx)
 
 ### Quick Start
 ```sh
